@@ -64,7 +64,7 @@ export class AuthService {
     return { adminId: admin.id };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, res: Response) {
     const admin = await this.adminService.findByEmail(loginDto.email);
     if (!admin) {
       throw new UnauthorizedException("Email yoki password xato");
@@ -79,13 +79,12 @@ export class AuthService {
 
     const { accessToken, refreshToken } = await this.generateToken(admin);
 
-    // refresh_token ni alohida ustunga saqlash
     admin.refresh_token = await bcrypt.hash(refreshToken, 7);
     await this.adminRepo.save(admin);
 
-    return {
+    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    return res.json({
       accessToken,
-      refreshToken,
       admin: {
         id: admin.id,
         email: admin.email,
@@ -93,7 +92,7 @@ export class AuthService {
         is_active: admin.is_active,
         is_creator: admin.is_creator,
       },
-    };
+    });
   }
 
   async refresh(req: Request, res: Response) {
@@ -152,61 +151,120 @@ export class AuthService {
     }
   }
 
-  async logout(refreshToken: string, res:Response){
+  async logout(refreshToken: string, res: Response) {
     let adminData: any;
     try {
-      adminData=await this.jwtService.verify(refreshToken, {
+      adminData = await this.jwtService.verify(refreshToken, {
         secret: process.env.REFRESH_TOKEN_KEY,
       });
     } catch (error) {
       console.log(error);
     }
-    if(!adminData){
-      throw new ForbiddenException("Admin not verified")
+    if (!adminData) {
+      throw new ForbiddenException("Admin not verified");
     }
-    await this.adminService.updateRefreshToken(adminData.id, "")
+    await this.adminService.updateRefreshToken(adminData.id, "");
     res.clearCookie("refreshToken");
-    return {message: "Logged out successfully"}
+    return { message: "Logged out successfully" };
   }
 
-  async register(createUserDto: CreateUserDto){
-    const candidate=await this.userRepo.findOneBy({email: createUserDto.email});
-    if(candidate){
-      throw new ConflictException("Bunday email mavjud")
+  async register(createUserDto: CreateUserDto) {
+    const candidate = await this.userRepo.findOneBy({
+      email: createUserDto.email,
+    });
+    if (candidate) {
+      throw new ConflictException("Bunday email mavjud");
     }
-    const user=await this.userRepo.save(createUserDto)
-    return {userId: user.id}
+    const user = await this.userRepo.save(createUserDto);
+    return { userId: user.id };
   }
 
-  async userLogin(dto: LoginUserDto, res:Response){
-    const user=await this.userRepo.findOneBy({
-      email: dto.email
-    })
-    if(!user){
-      throw new UnauthorizedException("Email topilmadi yoki noto'g'ri")
-    }
-    const isMatch=await bcrypt.compare(dto.password, 
-      user.hashed_password
-    );
-    if(!isMatch){
+  async userLogin(dto: LoginUserDto, res: Response) {
+    const user = await this.userRepo.findOneBy({ email: dto.email });
+    if (!user) {
       throw new UnauthorizedException("Email topilmadi yoki noto'g'ri");
     }
-    const payload={
-      id: user.id,
-      email: user.email,
+    const isMatch = await bcrypt.compare(dto.password, user.hashed_password);
+    if (!isMatch) {
+      throw new UnauthorizedException("Email topilmadi yoki noto'g'ri");
     }
-    const accessToken=await this.jwtService.signAsync(payload, {
+    const payload = { id: user.id, email: user.email };
+    const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.ACCESS_TOKEN_KEY,
-      expiresIn: process.env.ACCESS_TOKEN_TIME
-    })
-    const refreshToken=await this.jwtService.signAsync(payload, {
-      secret: process.env.REFRESH_TOKEN_KEY, 
-      expiresIn: process.env.REFRESH_TOKEN_TIME
-    })
-    user.refresh_token=await bcrypt.hash(refreshToken, 7)
-    await this.adminRepo.save(user)
-    res.cookie("refreshToken", refreshToken, {httpOnly: true})
-    return res.send({accessToken: accessToken, refreshToken: refreshToken})
+      expiresIn: process.env.ACCESS_TOKEN_TIME,
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.REFRESH_TOKEN_KEY,
+      expiresIn: process.env.REFRESH_TOKEN_TIME,
+    });
+    user.refresh_token = await bcrypt.hash(refreshToken, 7);
+    await this.userRepo.save(user);
+    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    return res.json({ accessToken, user: { id: user.id, email: user.email } });
   }
 
+  async userRefresh(req: Request, res: Response) {
+    const token = req.cookies.refreshToken;
+    if (!token) {
+      throw new UnauthorizedException("Refresh token topilmadi");
+    }
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.REFRESH_TOKEN_KEY || "",
+      });
+      const user = await this.userRepo.findOneBy({ id: payload.id });
+      if (!user || !user.refresh_token) {
+        throw new UnauthorizedException(
+          "User topilmadi yoki refresh token yo'q"
+        );
+      }
+      const isTokenValid = await bcrypt.compare(
+        token,
+        user.refresh_token || ""
+      );
+      if (!isTokenValid) {
+        throw new UnauthorizedException("Refresh token noto‘g‘ri");
+      }
+      const newAccessToken = await this.jwtService.signAsync(
+        { id: user.id, email: user.email },
+        {
+          secret: process.env.ACCESS_TOKEN_KEY || "",
+          expiresIn: process.env.ACCESS_TOKEN_TIME || "1d",
+        }
+      );
+      const newRefreshToken = await this.jwtService.signAsync(
+        { id: user.id, email: user.email },
+        {
+          secret: process.env.REFRESH_TOKEN_KEY || "",
+          expiresIn: process.env.REFRESH_TOKEN_TIME || "7d",
+        }
+      );
+      user.refresh_token = await bcrypt.hash(newRefreshToken, 7);
+      await this.userRepo.save(user);
+      res.cookie("refreshToken", newRefreshToken, { httpOnly: true });
+      return res.json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    } catch (error) {
+      throw new UnauthorizedException("Refresh token noto‘g‘ri yoki eskirgan");
+    }
+  }
+
+  async userLogout(refreshToken: string, res: Response) {
+    let userData: any;
+    try {
+      userData = await this.jwtService.verify(refreshToken, {
+        secret: process.env.REFRESH_TOKEN_KEY,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    if (!userData) {
+      throw new ForbiddenException("User not verified");
+    }
+    await this.userRepo.update(userData.id, { refresh_token: "" });
+    res.clearCookie("refreshToken");
+    return { message: "Logged out successfully" };
+  }
 }

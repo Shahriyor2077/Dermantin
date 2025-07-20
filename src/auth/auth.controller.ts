@@ -1,4 +1,3 @@
-
 import { Controller, Post, Body, Req, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateAdminDto } from "src/admin/dto/create-admin.dto";
@@ -17,8 +16,8 @@ export class AuthController {
   }
 
   @Post("admin/login")
-  loginAdmin(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  loginAdmin(@Body() dto: LoginDto, @Res() res: Response) {
+    return this.authService.login(dto, res);
   }
 
   @Post("admin/refresh")
@@ -42,5 +41,15 @@ export class AuthController {
   @Post("user/login")
   loginUser(@Body() dto: LoginUserDto, @Res() res: Response) {
     return this.authService.userLogin(dto, res);
+  }
+
+  @Post("user/refresh")
+  userRefresh(@Req() req: Request, @Res() res: Response) {
+    return this.authService.userRefresh(req, res);
+  }
+
+  @Post("user/logout")
+  userLogout(@Body("refreshToken") refreshToken: string, @Res() res: Response) {
+    return this.authService.userLogout(refreshToken, res);
   }
 }
