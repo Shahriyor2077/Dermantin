@@ -1,0 +1,42 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateUserDto {
+  confirm_password: String!
+  email: String!
+  full_name: String!
+  is_active: Boolean! = false
+  password: String!
+  phone: String!
+}
+
+type Mutation {
+  createUser(createUser: CreateUserDto!): User!
+  removeUser(id: ID!): Float!
+  updateUser(id: ID!, updateUser: UpdateUserDto!): User!
+}
+
+type Query {
+  findAllUsers: [User!]!
+  findOneUser(id: ID!): User!
+}
+
+input UpdateUserDto {
+  email: String!
+  full_name: String!
+  hashed_password: String
+  is_active: Boolean! = false
+  password: String!
+  phone: String!
+}
+
+type User {
+  email: String!
+  full_name: String!
+  hashed_password: String!
+  id: ID!
+  is_active: Boolean!
+  phone: String!
+  refresh_token: String
+}

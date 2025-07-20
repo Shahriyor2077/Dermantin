@@ -1,0 +1,41 @@
+import {
+
+} from "@nestjs/common";
+import { UserService } from "./user.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { User } from "./entities/user.entity";
+
+@Resolver("users")
+export class UsersResolver {
+  constructor(private readonly userService: UserService) {}
+
+  @Query(() => [User])
+  findAllUsers() {
+    return this.userService.findAll();
+  }
+
+  @Query(() => User)
+  findOneUser(@Args("id", { type: () => ID }) id: string) {
+    return this.userService.findOne(+id);
+  }
+
+  @Mutation(() => User)
+  createUser(@Args("createUser") createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
+
+  @Mutation(() => User)
+  updateUser(
+    @Args("id", { type: () => ID }) id: number,
+    @Args("updateUser") updateUserDto: UpdateUserDto
+  ) {
+    return this.userService.update(+id, updateUserDto);
+  }
+
+  @Mutation(() => Number)
+  removeUser(@Args("id", { type: () => ID }) id: number) {
+    return this.userService.remove(+id);
+  }
+}
