@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Dermantin } from "src/dermantin/entities/dermantin.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -8,9 +9,9 @@ export class DermantinImage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
-  @Column() // bog'lanadi
-  dermantin_id: number;
+  @Field(()=>Dermantin)
+  @ManyToOne(()=>Dermantin, (dermantin)=>dermantin.dermantin_image)
+  dermantin: Dermantin
 
   @Field()
   @Column()

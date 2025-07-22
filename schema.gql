@@ -2,6 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AdminData {
+  email: String!
+  full_name: String!
+  id: Float!
+  is_active: Boolean!
+  is_creator: Boolean!
+}
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+input CreateAdminDto {
+  confirm_password: String!
+  email: String!
+  full_name: String!
+  is_active: Boolean! = true
+  is_creator: Boolean! = false
+  password: String!
+  phone: String!
+}
+
 input CreateUserDto {
   confirm_password: String!
   email: String!
@@ -11,15 +34,63 @@ input CreateUserDto {
   phone: String!
 }
 
+type Dermantin {
+  class: String!
+  id: ID!
+  name: String!
+  price: String!
+  rating: String!
+  store_id: Float!
+}
+
+type LoginAdminResponse {
+  accessToken: String!
+  admin: AdminData!
+  refreshToken: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input LoginUserDto {
+  email: String!
+  password: String!
+}
+
+type LoginUserResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: UserData!
+}
+
+type MessageResponse {
+  message: String!
+}
+
 type Mutation {
   createUser(createUser: CreateUserDto!): User!
+  loginAdmin(loginDto: LoginDto!): LoginAdminResponse!
+  loginUser(loginUserDto: LoginUserDto!): LoginUserResponse!
+  logoutAdmin(refreshToken: String!): MessageResponse!
+  refreshAdmin: AuthResponse!
+  refreshUser: AuthResponse!
+  registerAdmin(createAdminDto: CreateAdminDto!): RegistrationResponse!
+  registerUser(createUserDto: CreateUserDto!): RegistrationResponse!
   removeUser(id: ID!): Float!
   updateUser(id: ID!, updateUser: UpdateUserDto!): User!
+  userLogout(refreshToken: String!): MessageResponse!
 }
 
 type Query {
   findAllUsers: [User!]!
   findOneUser(id: ID!): User!
+}
+
+type RegistrationResponse {
+  adminId: Float
+  userId: Float
 }
 
 input UpdateUserDto {
@@ -39,4 +110,9 @@ type User {
   is_active: Boolean!
   phone: String!
   refresh_token: String
+}
+
+type UserData {
+  email: String!
+  id: Float!
 }

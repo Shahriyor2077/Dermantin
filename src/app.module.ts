@@ -5,12 +5,14 @@ import { config } from "process";
 import { UserModule } from "./user/user.module";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { CategoryModule } from './category/category.module';
-import { DermantinImageModule } from './dermantin_image/dermantin_image.module';
-import { HistoryModule } from './history/history.module';
+import { CategoryModule } from "./category/category.module";
+import { DermantinImageModule } from "./dermantin_image/dermantin_image.module";
+import { HistoryModule } from "./history/history.module";
 import { RequestModule } from "./request/request.module";
-import { AuthModule } from './auth/auth.module';
-import { AdminModule } from './admin/admin.module';
+import { AuthModule } from "./auth/auth.module";
+import { AdminModule } from "./admin/admin.module";
+import { DermantinModule } from "./dermantin/dermantin.module";
+import { AdvertisementsModule } from "./advertisements/advertisements.module";
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { AdminModule } from './admin/admin.module';
       autoSchemaFile: "schema.gql",
       sortSchema: true,
       playground: true,
+      context: ({ req, res }) => ({ req, res }),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -42,7 +45,9 @@ import { AdminModule } from './admin/admin.module';
     HistoryModule,
     RequestModule,
     AuthModule,
-    AdminModule
+    AdminModule,
+    DermantinModule,
+    AdvertisementsModule,
   ],
   controllers: [],
   providers: [],
