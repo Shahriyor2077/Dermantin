@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum RequestStatus {
   PENDING = "pending",
@@ -14,9 +15,8 @@ export class Request {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
-  @Column()
-  user_id: number;
+  @ManyToOne(()=>User, (user)=>user.request)
+  user:User
 
   @Field()
   @Column()

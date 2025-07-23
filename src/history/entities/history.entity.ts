@@ -1,5 +1,7 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Dermantin } from "src/dermantin/entities/dermantin.entity";
+import { User } from "src/user/entities/user.entity";
+import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
@@ -9,11 +11,9 @@ export class History {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Field()
-    @Column()
-    dermantin_id: number
+    @ManyToOne(()=>User, (user)=>user.history)
+    user:User
 
-    @Field()
-    @Column()
-    user_id: number
+    @ManyToOne(()=>Dermantin, (dermantin)=>dermantin.history)
+    dermantin: Dermantin
 }

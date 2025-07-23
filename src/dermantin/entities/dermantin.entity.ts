@@ -2,6 +2,7 @@ import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { Advertisement } from "src/advertisements/entities/advertisement.entity";
 import { Category } from "src/category/entities/category.entity";
 import { DermantinImage } from "src/dermantin_image/entities/dermantin_image.entity";
+import { History } from "src/history/entities/history.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
@@ -41,6 +42,8 @@ export class Dermantin {
   dermantin_image: DermantinImage[];
 
   @OneToMany(() => Advertisement, (advertisement) => advertisement.dermantin)
-  advertisement: Advertisement[]
-}
+  advertisement: Advertisement[];
 
+  @OneToMany(()=>History, (history)=>history.dermantin)
+  history: History[]
+}

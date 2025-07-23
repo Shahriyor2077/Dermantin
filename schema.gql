@@ -15,6 +15,11 @@ type AuthResponse {
   refreshToken: String!
 }
 
+type Chat {
+  id: ID!
+  user: User!
+}
+
 input CreateAdminDto {
   confirm_password: String!
   email: String!

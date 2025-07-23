@@ -13,6 +13,9 @@ import { AuthModule } from "./auth/auth.module";
 import { AdminModule } from "./admin/admin.module";
 import { DermantinModule } from "./dermantin/dermantin.module";
 import { AdvertisementsModule } from "./advertisements/advertisements.module";
+import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -48,6 +51,9 @@ import { AdvertisementsModule } from "./advertisements/advertisements.module";
     AdminModule,
     DermantinModule,
     AdvertisementsModule,
+    ChatModule,
+    MessageModule,
+    StoreModule,
   ],
   controllers: [],
   providers: [],
