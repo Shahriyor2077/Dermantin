@@ -25,8 +25,9 @@ export class MessageResolver {
   }
 
   @Mutation(()=>Message)
+
   updateMessage(
-    @Args("id", {type: (()=>ID)}) id: number,
+    @Args("id", {type: ()=>ID}) id: number,
     @Args("updateMessage") updateMessageDto: UpdateMessageDto
   ) {
     return this.messageService.update(+id, updateMessageDto);

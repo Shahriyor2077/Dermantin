@@ -1,6 +1,8 @@
 import { Field, ID, ObjectType, registerEnumType } from "@nestjs/graphql";
 import { User } from "src/user/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Social } from "../../socials/entities/social.entity";
+import { Order } from "../../order/entities/order.entity";
 
 export enum Region {
   TASHKENT_CITY = "TASHKENT_CITY",
@@ -73,4 +75,10 @@ export class Store {
     default: Status.ACTIVE,
   })
   status: Status;
+
+  @OneToMany(() => Social, (social) => social.store)
+  socials: Social[];
+
+  @OneToMany(() => Order, (order) => order.store)
+  orders: Order[];
 }

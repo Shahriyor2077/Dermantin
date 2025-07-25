@@ -3,7 +3,10 @@ import { Chat } from "src/chat/entities/chat.entity";
 import { History } from "src/history/entities/history.entity";
 import { Request } from "src/request/entities/request.entity";
 import { Store } from "src/store/entities/store.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Review } from "../../review/entities/review.entity";
+import { Order } from "../../order/entities/order.entity";
+import { Payment } from "../../payment/entities/payment.entity";
 
 @ObjectType()
 @Entity()
@@ -42,9 +45,19 @@ export class User {
   @OneToMany(() => Store, (store) => store.user)
   store: Store[];
 
-  @OneToMany(()=>History, (history)=>history.user)
-  history: History[]
+  @OneToMany(() => History, (history) => history.user)
+  history: History[];
 
-  @OneToMany(()=>Request, (request)=>request.user)
-  request: Request[]
+  @OneToMany(() => Request, (request) => request.user)
+  request: Request[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 }
+

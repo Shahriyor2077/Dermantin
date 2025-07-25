@@ -16,6 +16,10 @@ import { AdvertisementsModule } from "./advertisements/advertisements.module";
 import { ChatModule } from './chat/chat.module';
 import { MessageModule } from './message/message.module';
 import { StoreModule } from './store/store.module';
+import { SocialsModule } from './socials/socials.module';
+import { ReviewModule } from './review/review.module';
+import { OrderModule } from './order/order.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -54,6 +58,10 @@ import { StoreModule } from './store/store.module';
     ChatModule,
     MessageModule,
     StoreModule,
+    SocialsModule,
+    ReviewModule,
+    OrderModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [],

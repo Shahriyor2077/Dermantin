@@ -4,6 +4,8 @@ import { Category } from "src/category/entities/category.entity";
 import { DermantinImage } from "src/dermantin_image/entities/dermantin_image.entity";
 import { History } from "src/history/entities/history.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Review } from "../../review/entities/review.entity";
+import { Order } from "../../order/entities/order.entity";
 
 @ObjectType()
 @Entity()
@@ -44,6 +46,12 @@ export class Dermantin {
   @OneToMany(() => Advertisement, (advertisement) => advertisement.dermantin)
   advertisement: Advertisement[];
 
-  @OneToMany(()=>History, (history)=>history.dermantin)
-  history: History[]
+  @OneToMany(() => History, (history) => history.dermantin)
+  history: History[];
+
+  @OneToMany(() => Review, (review) => review.dermantin)
+  reviews: Review[];
+
+  @OneToMany(() => Order, (order) => order.dermantin)
+  orders: Order[];
 }
